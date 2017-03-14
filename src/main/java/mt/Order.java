@@ -9,7 +9,7 @@ import java.io.Serializable;
  * 
  * @author alc
  */
-//This is a change in the project
+//this is a minor change
 
 public class Order implements Serializable {
 	/**
