@@ -9,7 +9,7 @@ import java.io.Serializable;
  * 
  * @author alc
  */
-//this is a minor change
+//ES2 deliverable
 
 public class Order implements Serializable {
 	/**
