@@ -127,7 +127,6 @@ public class MicroServer implements MicroTraderServer {
 	 */
 	public boolean verifyMinimumOrderReq(ServerSideMessage msg){
 		if(msg.getOrder().getNumberOfUnits() < 10){
-//			serverComm.sendError(msg.getSenderNickname(), "Minimum of quantity must be 10");
 			return false;
 		} else {
 			return true;
