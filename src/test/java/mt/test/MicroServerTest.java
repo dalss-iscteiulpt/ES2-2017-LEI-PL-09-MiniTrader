@@ -89,6 +89,12 @@ public class MicroServerTest {
 	@Mock
 	private ServerSideMessage notEnoughMsg;
 	
+	@Mock
+	private ServerSideMessage sameUser1;
+	
+	@Mock
+	private ServerSideMessage sameUser2;
+	
 	
 	
 	@Before
@@ -163,6 +169,8 @@ public class MicroServerTest {
 		when(sell6.getOrder()).thenReturn(Order.createSellOrder("gLid", "ISCTE", 15, 21.0));
 		when(sell6.getSenderNickname()).thenReturn("gLid");
 		
+		
+		
 		when(notEnoughMsg.getType()).thenReturn(Type.NEW_ORDER);
 		when(notEnoughMsg.getOrder()).thenReturn(Order.createSellOrder("dalss", "ISCTE", 9, 21.0));
 		when(notEnoughMsg.getSenderNickname()).thenReturn("dalss");
@@ -170,6 +178,15 @@ public class MicroServerTest {
 		when(connectDalss.getType()).thenReturn(Type.CONNECTED);
 		when(connectDalss.getOrder()).thenReturn(null);
 		when(connectDalss.getSenderNickname()).thenReturn("dalss");
+		
+		when(sameUser1.getType()).thenReturn(Type.NEW_ORDER);
+		when(sameUser1.getOrder()).thenReturn(Order.createSellOrder("dalss", "ISCTE", 20, 30.0));
+		when(sameUser1.getSenderNickname()).thenReturn("dalss");
+		
+		when(sameUser2.getType()).thenReturn(Type.NEW_ORDER);
+		when(sameUser2.getOrder()).thenReturn(Order.createBuyOrder("dalss", "ISCTE", 20, 30.0));
+		when(sameUser2.getSenderNickname()).thenReturn("dalss");
+		
 		
 	}
 	
@@ -265,6 +282,19 @@ public class MicroServerTest {
 		
 		verify(serverComm, atLeastOnce()).sendError("dalss", "Minimum Number of Orders must be 10.");
 	}
+	
+	@Test
+	public void testSameUserOrders(){
+		when(serverComm.getNextMessage()).thenReturn(connectDalss).thenReturn(sameUser1).thenReturn(sameUser2).thenReturn(null);
+
+		ms.start(serverComm);
+		
+		verify(serverComm, atLeastOnce()).sendOrder("dalss",Order.createBuyOrder("dalss", "ISCTE", 20, 30.0) );
+		verify(serverComm, atLeastOnce()).sendOrder("dalss",Order.createSellOrder("dalss", "ISCTE", 20, 30.0) );
+		verify(serverComm, never()).sendOrder("dalss",Order.createBuyOrder("dalss", "ISCTE", 0, 30.0) );
+	}
+	
+	
 	
 //	@Test
 //	public void testProcessUserDisconnected() throws Exception {		
