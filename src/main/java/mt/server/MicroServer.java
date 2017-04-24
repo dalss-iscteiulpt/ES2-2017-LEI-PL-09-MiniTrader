@@ -385,7 +385,7 @@ public class MicroServer implements MicroTraderServer {
 		}
 		
 		if(count == MAX_SELL_ORDERS_PER_USER){
-			throw new ServerException("Sell orders limit exceeded");
+			throw new ServerException("Sell orders limit exceeded.");
 		}
 	}
 	
