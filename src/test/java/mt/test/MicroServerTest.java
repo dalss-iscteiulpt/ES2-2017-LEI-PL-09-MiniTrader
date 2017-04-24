@@ -61,6 +61,30 @@ public class MicroServerTest {
 	@Mock
 	private ServerSideMessage msg11;
 	
+	@Mock
+	private ServerSideMessage connectT;
+	
+	@Mock
+	private ServerSideMessage sell1;
+	
+	@Mock
+	private ServerSideMessage sell2;
+	
+	@Mock
+	private ServerSideMessage sell3;
+	
+	@Mock
+	private ServerSideMessage sell4;
+	
+	@Mock
+	private ServerSideMessage sell5;
+	
+	@Mock
+	private ServerSideMessage sell6;
+	
+	@Mock
+	private ServerSideMessage notEnoughUnits;
+	
 	@Before
 	public void setup(){
 		ms = new MicroServer();
@@ -103,8 +127,39 @@ public class MicroServerTest {
 	
 		when(msg10.getType()).thenReturn(Type.NEW_ORDER);
 		when(msg10.getOrder()).thenReturn(null);
-		when(msg10.getSenderNickname()).thenReturn("userA");	
+		when(msg10.getSenderNickname()).thenReturn("userA");
 		
+		when(connectT.getType()).thenReturn(Type.CONNECTED);
+		when(connectT.getOrder()).thenReturn(null);
+		when(connectT.getSenderNickname()).thenReturn("tmggs");
+		
+		when(sell1.getType()).thenReturn(Type.NEW_ORDER);
+		when(sell1.getOrder()).thenReturn(Order.createSellOrder("tmggs", "ISCTE", 15, 21.0));
+		when(sell1.getSenderNickname()).thenReturn("tmggs");
+		
+		when(sell2.getType()).thenReturn(Type.NEW_ORDER);
+		when(sell2.getOrder()).thenReturn(Order.createSellOrder("tmggs", "ISCTE", 15, 21.0));
+		when(sell2.getSenderNickname()).thenReturn("tmggs");
+		
+		when(sell3.getType()).thenReturn(Type.NEW_ORDER);
+		when(sell3.getOrder()).thenReturn(Order.createSellOrder("tmggs", "ISCTE", 15, 21.0));
+		when(sell3.getSenderNickname()).thenReturn("tmggs");
+		
+		when(sell4.getType()).thenReturn(Type.NEW_ORDER);
+		when(sell4.getOrder()).thenReturn(Order.createSellOrder("tmggs", "ISCTE", 15, 21.0));
+		when(sell4.getSenderNickname()).thenReturn("tmggs");
+		
+		when(sell5.getType()).thenReturn(Type.NEW_ORDER);
+		when(sell5.getOrder()).thenReturn(Order.createSellOrder("tmggs", "ISCTE", 15, 21.0));
+		when(sell5.getSenderNickname()).thenReturn("tmggs");
+		
+		when(sell6.getType()).thenReturn(Type.NEW_ORDER);
+		when(sell6.getOrder()).thenReturn(Order.createSellOrder("tmggs", "ISCTE", 15, 21.0));
+		when(sell6.getSenderNickname()).thenReturn("tmggs");
+		
+		when(notEnoughUnits.getType()).thenReturn(Type.NEW_ORDER);
+		when(notEnoughUnits.getOrder()).thenReturn(Order.createSellOrder("tmggs", "ISCTE", 9, 20));
+		when(notEnoughUnits.getSenderNickname()).thenReturn("tmggs");
 		
 	}
 	
@@ -127,8 +182,8 @@ public class MicroServerTest {
 		
 		ms.start(serverComm);
 		
-		verify(serverComm, atLeastOnce()).sendOrder("userB", Order.createSellOrder("userA", "MSFT", 5, 20.0) );
-		verify(serverComm, atLeastOnce()).sendOrder("userB", Order.createBuyOrder("userB", "MSFT", 0, 21.0) );
+		verify(serverComm, atLeastOnce()).sendOrder("userB", Order.createSellOrder("userA", "MSFT", 10, 20.0) );
+		verify(serverComm, atLeastOnce()).sendOrder("userB", Order.createBuyOrder("userA", "MSFT", 10, 20.0) );
 	}
 	
 	@Test
@@ -172,7 +227,7 @@ public class MicroServerTest {
 		when(serverComm.getNextMessage()).thenReturn(msg1).thenReturn(msg2).thenReturn(msg3).thenReturn(msg4).thenReturn(msg5).thenReturn(msg6).thenReturn(null);
 		ms.start(serverComm);
 		
-		verify(serverComm, atLeastOnce()).sendOrder("userA", Order.createSellOrder("userA", "MSFT", 5, 20.0));
+		verify(serverComm, atLeastOnce()).sendOrder("userA", Order.createSellOrder("userA", "MSFT", 10, 20.0));
 	}
 	
 	@Test
@@ -181,6 +236,22 @@ public class MicroServerTest {
 		ms.start(serverComm);
 		
 		verify(serverComm, atLeastOnce()).sendError(msg1.getSenderNickname(), "The user " + msg1.getSenderNickname() + " is already connected.");
+	}
+	
+	@Test
+	public void testSellOrdersBelowLimit(){
+		when(serverComm.getNextMessage()).thenReturn(connectT).thenReturn(sell1).thenReturn(sell2).thenReturn(sell3).thenReturn(sell4).thenReturn(sell5).thenReturn(sell6).thenReturn(null);
+		ms.start(serverComm);
+		
+		verify(serverComm, atLeastOnce()).sendError("tmggs", "Sell orders limit exceeded");
+	}
+	
+	@Test
+	public void testOfferWithNotEnoughUnits(){
+		when(serverComm.getNextMessage()).thenReturn(connectT).thenReturn(notEnoughUnits).thenReturn(null);
+		ms.start(serverComm);
+		
+		verify(serverComm, atLeastOnce()).sendError("tmggs", "Minimum Number of Units per Order must be 10.");
 	}
 	
 //	@Test
