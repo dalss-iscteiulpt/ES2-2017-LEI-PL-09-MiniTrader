@@ -11,6 +11,7 @@ import mt.comm.ClientComm;
  *
  */
 
+
 public interface MicroTraderClient {
 
 	/**
