@@ -103,6 +103,9 @@ public class MicroServer implements MicroTraderServer {
 						if(msg.getOrder().getServerOrderID() == EMPTY){
 							msg.getOrder().setServerOrderID(id++);
 						}
+						if(!verifyMinimumOrderReq(msg)){
+							throw new ServerException("Minimum Number of Orders must be 10.");
+						}
 						notifyAllClients(msg.getOrder());
 						processNewOrder(msg);
 					} catch (ServerException e) {
@@ -116,6 +119,13 @@ public class MicroServer implements MicroTraderServer {
 		LOGGER.log(Level.INFO, "Shutting Down Server...");
 	}
 
+	
+	public boolean verifyMinimumOrderReq(ServerSideMessage msg){
+		if(msg.getOrder().getNumberOfUnits() < 10){
+			return false;
+		}
+		return true;
+	}
 
 	/**
 	 * Verify if user is already connected
