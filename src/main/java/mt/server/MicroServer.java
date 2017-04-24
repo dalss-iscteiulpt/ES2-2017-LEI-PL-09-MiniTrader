@@ -57,6 +57,8 @@ public class MicroServer implements MicroTraderServer {
 	 */
 	private static int id = 1;
 	
+	private int MAX_SELL_ORDERS_PER_USER = 5;
+	
 	/** The value is {@value #EMPTY} */
 	public static final int EMPTY = 0;
 
@@ -100,6 +102,7 @@ public class MicroServer implements MicroTraderServer {
 				case NEW_ORDER:
 					try {
 						verifyUserConnected(msg);
+						checkSellOrdersLimit(msg.getOrder());
 						if(msg.getOrder().getServerOrderID() == EMPTY){
 							msg.getOrder().setServerOrderID(id++);
 						}
@@ -361,6 +364,28 @@ public class MicroServer implements MicroTraderServer {
 		}
 		for (Entry<String, Set<Order>> entry : orderMap.entrySet()) {
 			serverComm.sendOrder(entry.getKey(), order); 
+		}
+	}
+	
+	/**
+	 * Checks if sell orders limit has been achieved
+	 * @param newOrder
+	 * @throws ServerException
+	 */
+	private void checkSellOrdersLimit(Order newOrder) throws ServerException {
+		
+		int count = 0;
+		Set<Order> orders = orderMap.get(newOrder.getNickname());
+		
+		for(Order obj: orders){
+			
+			if(obj.isSellOrder()){
+				count++;
+			}
+		}
+		
+		if(count == MAX_SELL_ORDERS_PER_USER){
+			throw new ServerException("Sell orders limit exceeded");
 		}
 	}
 	
