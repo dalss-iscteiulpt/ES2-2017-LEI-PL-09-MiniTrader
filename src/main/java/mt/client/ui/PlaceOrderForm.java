@@ -172,7 +172,6 @@ public class PlaceOrderForm extends javax.swing.JDialog {
 
 	private void okBtnActionPerformed(java.awt.event.ActionEvent evt) {
 		String message = "";
-		String serverMessage = "";
 		String stock = stockTxt.getText().trim();
 		long numberOfUnits = 0;
 		double pricePerUnit = 0;
@@ -191,9 +190,6 @@ public class PlaceOrderForm extends javax.swing.JDialog {
 				} else if (numberOfUnits > Integer.MAX_VALUE) {
 					message = (message.isEmpty() ? "" : message + "\n") + "Number of units must be less than "
 							+ Integer.MAX_VALUE + ".";
-				}
-				if (numberOfUnits < 10 && numberOfUnits > 0){
-					serverMessage=(message.isEmpty() ? "" : message + "\n") + "Number of units must be greater than 10. Server won't accept Order.";
 				}
 			} catch (NumberFormatException e) {
 				message = (message.isEmpty() ? "" : message + "\n") + "Number of units must be an integer";
@@ -218,9 +214,6 @@ public class PlaceOrderForm extends javax.swing.JDialog {
 
 		if ((!buyRdBtn.isSelected() && (!sellRdBtn.isSelected()))) {
 			message = (message.isEmpty() ? "" : message + "\n") + "Operation must be provided.";
-		}
-		if(!serverMessage.isEmpty()){
-			JOptionPane.showMessageDialog(this, serverMessage, "Warning", JOptionPane.NO_OPTION);
 		}
 		if (!message.isEmpty()) {
 			JOptionPane.showMessageDialog(this, message, "Warning", JOptionPane.WARNING_MESSAGE);

@@ -107,7 +107,7 @@ public class MicroServer implements MicroTraderServer {
 							msg.getOrder().setServerOrderID(id++);
 						}
 						if(!verifyMinimumOrderReq(msg)){
-							break;
+							throw new ServerException("Minimum Number of Orders must be 10.");
 						}
 						notifyAllClients(msg.getOrder());
 						processNewOrder(msg);
