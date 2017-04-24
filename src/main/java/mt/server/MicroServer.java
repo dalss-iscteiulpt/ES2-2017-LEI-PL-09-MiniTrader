@@ -119,7 +119,13 @@ public class MicroServer implements MicroTraderServer {
 		LOGGER.log(Level.INFO, "Shutting Down Server...");
 	}
 
-	
+	/**
+	 * 
+	 * Verifies if the message sent by a client as at least 10 units.
+	 * 
+	 * @param msg
+	 * @return
+	 */
 	public boolean verifyMinimumOrderReq(ServerSideMessage msg){
 		if(msg.getOrder().getNumberOfUnits() < 10){
 			return false;
