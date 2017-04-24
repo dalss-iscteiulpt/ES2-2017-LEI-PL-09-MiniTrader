@@ -83,6 +83,12 @@ public class MicroServerTest {
 	@Mock
 	private ServerSideMessage sell6;
 	
+	@Mock
+	private ServerSideMessage connectDalss;
+	
+	@Mock
+	private ServerSideMessage notEnoughMsg;
+	
 	
 	
 	@Before
@@ -156,6 +162,15 @@ public class MicroServerTest {
 		when(sell6.getType()).thenReturn(Type.NEW_ORDER);
 		when(sell6.getOrder()).thenReturn(Order.createSellOrder("gLid", "ISCTE", 15, 21.0));
 		when(sell6.getSenderNickname()).thenReturn("gLid");
+		
+		when(notEnoughMsg.getType()).thenReturn(Type.NEW_ORDER);
+		when(notEnoughMsg.getOrder()).thenReturn(Order.createSellOrder("dalss", "ISCTE", 9, 21.0));
+		when(notEnoughMsg.getSenderNickname()).thenReturn("dalss");
+		
+		when(connectDalss.getType()).thenReturn(Type.CONNECTED);
+		when(connectDalss.getOrder()).thenReturn(null);
+		when(connectDalss.getSenderNickname()).thenReturn("dalss");
+		
 	}
 	
 	@After
@@ -240,6 +255,15 @@ public class MicroServerTest {
 		ms.start(serverComm);
 		
 		verify(serverComm, atLeastOnce()).sendError("gLid", "Sell orders limit exceeded.");
+	}
+	
+	@Test
+	public void testSellOrderWithoutEnoughUnits(){
+		when(serverComm.getNextMessage()).thenReturn(connectDalss).thenReturn(notEnoughMsg).thenReturn(null);
+		
+		ms.start(serverComm);
+		
+		verify(serverComm, atLeastOnce()).sendError("dalss", "Minimum Number of Orders must be 10.");
 	}
 	
 //	@Test
