@@ -103,11 +103,11 @@ public class MicroServer implements MicroTraderServer {
 					try {
 						verifyUserConnected(msg);
 						checkSellOrdersLimit(msg.getOrder());
+						if(verifyMinimumOrderReq(msg) == false){
+							throw new ServerException("Minimum Number of Units per Order must be 10.");
+						}
 						if(msg.getOrder().getServerOrderID() == EMPTY){
 							msg.getOrder().setServerOrderID(id++);
-						}
-						if(!verifyMinimumOrderReq(msg)){
-							throw new ServerException("Minimum Number of Orders must be 10.");
 						}
 						notifyAllClients(msg.getOrder());
 						processNewOrder(msg);
