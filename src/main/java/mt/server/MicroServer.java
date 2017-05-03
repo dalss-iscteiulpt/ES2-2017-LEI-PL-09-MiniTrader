@@ -109,6 +109,7 @@ public class MicroServer implements MicroTraderServer {
 						if(!verifyMinimumOrderReq(msg)){
 							throw new ServerException("Minimum Number of Orders must be 10.");
 						}
+						verifyNoEqualUser(msg);
 						notifyAllClients(msg.getOrder());
 						processNewOrder(msg);
 					} catch (ServerException e) {
@@ -133,6 +134,25 @@ public class MicroServer implements MicroTraderServer {
 			return false;
 		} else {
 			return true;
+		}
+	}
+	
+	/**
+	 * Verifies if, when trying to sell or buy an order, there's already an existing order with the same
+	 * nickname and stock name. If that's the case it will throw the exception to the user.
+	 *
+	 * @param msg
+	 * @throws ServerException
+	 */
+	public void verifyNoEqualUser(ServerSideMessage msg) throws ServerException{
+		Order newOrder = msg.getOrder();
+		for (Entry<String, Set<Order>> entry : orderMap.entrySet()) {
+			for (Order o : entry.getValue()) {
+				if(newOrder.getNickname().equals(o.getNickname()) && 
+						newOrder.getStock().equals(o.getStock())){
+					throw new ServerException("Cannot post order to buy/sell from same user.");
+				}
+			}
 		}
 	}
 
@@ -288,9 +308,7 @@ public class MicroServer implements MicroTraderServer {
 		for (Entry<String, Set<Order>> entry : orderMap.entrySet()) {
 			for (Order o : entry.getValue()) {
 				if (o.isBuyOrder() && o.getStock().equals(sellOrder.getStock()) && o.getPricePerUnit() >= sellOrder.getPricePerUnit()) {
-					if(!sellOrder.getNickname().equals(o.getNickname())){
-						doTransaction (o, sellOrder);
-					}
+					doTransaction (o, sellOrder);
 				}
 			}
 		}
@@ -309,9 +327,7 @@ public class MicroServer implements MicroTraderServer {
 		for (Entry<String, Set<Order>> entry : orderMap.entrySet()) {
 			for (Order o : entry.getValue()) {
 				if (o.isSellOrder() && buyOrder.getStock().equals(o.getStock()) && o.getPricePerUnit() <= buyOrder.getPricePerUnit()) {
-					if(!buyOrder.getNickname().equals(o.getNickname())){
-						doTransaction(buyOrder, o);
-					}
+					doTransaction(buyOrder, o);
 				}
 			}
 		}
