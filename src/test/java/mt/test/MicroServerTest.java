@@ -280,7 +280,7 @@ public class MicroServerTest {
 		
 		ms.start(serverComm);
 		
-		verify(serverComm, atLeastOnce()).sendError("dalss", "Minimum Number of Orders must be 10.");
+		verify(serverComm, never()).sendOrder("dalss",Order.createSellOrder("dalss", "ISCTE", 9, 21.0) );
 	}
 	
 	@Test
@@ -290,8 +290,9 @@ public class MicroServerTest {
 		ms.start(serverComm);
 		
 		verify(serverComm, atLeastOnce()).sendOrder("dalss",Order.createBuyOrder("dalss", "ISCTE", 20, 30.0) );
-		verify(serverComm, never()).sendOrder("dalss",Order.createSellOrder("dalss", "ISCTE", 20, 30.0) );
-		verify(serverComm, atLeastOnce()).sendError("dalss", "Cannot post order to buy/sell from same user.");
+		verify(serverComm, atLeastOnce()).sendOrder("dalss",Order.createSellOrder("dalss", "ISCTE", 20, 30.0) );
+		verify(serverComm, never()).sendOrder("dalss",Order.createBuyOrder("dalss", "ISCTE", 0, 30.0) );
+		
 	}
 	
 	
