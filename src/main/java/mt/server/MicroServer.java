@@ -1,5 +1,7 @@
 package mt.server;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -13,12 +15,47 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
 import mt.Order;
 import mt.comm.ServerComm;
 import mt.comm.ServerSideMessage;
 import mt.comm.impl.ServerCommImpl;
 import mt.exception.ServerException;
 import mt.filter.AnalyticsFilter;
+import java.io.File;
+import java.io.FileOutputStream;
+
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathFactory;
+import javax.xml.parsers.DocumentBuilder;
+
+import org.w3c.dom.DOMException;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.UserDataHandler;
+import org.w3c.dom.Node;
+import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 
 /**
  * MicroTraderServer implementation. This class should be responsible
@@ -111,6 +148,7 @@ public class MicroServer implements MicroTraderServer {
 						}
 						notifyAllClients(msg.getOrder());
 						processNewOrder(msg);
+						insertIntoXml(msg);
 					} catch (ServerException e) {
 						serverComm.sendError(msg.getSenderNickname(), e.getMessage());
 					}
@@ -122,6 +160,54 @@ public class MicroServer implements MicroTraderServer {
 		LOGGER.log(Level.INFO, "Shutting Down Server...");
 	}
 
+	/**
+	 * Receives a message only if it is a NEW_ORDER
+	 * Adds the information regarding the order on the xml file.
+	 * 
+	 * @param msg
+	 */
+	public void insertIntoXml(ServerSideMessage msg){
+		Order order = msg.getOrder();         
+		try {
+			File xml = new File("Xml_US.xml");
+	        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+	        DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+	        Document doc = dBuilder.parse(xml);
+	        doc.getDocumentElement().normalize();
+	        
+	         // Create new element Order with attributes
+	         Element newElementOrder = doc.createElement("Order");
+	         String id = Integer.toString(order.getServerOrderID());
+	         String unit = Integer.toString(order.getNumberOfUnits());
+	         String price = Double.toString(order.getPricePerUnit());
+	         newElementOrder.setAttribute("Id", id);
+	         if (order.isBuyOrder()){
+		         newElementOrder.setAttribute("Type", "Buy");
+	         }
+	         else {
+		         newElementOrder.setAttribute("Type", "Sell");	 
+	         }
+	         newElementOrder.setAttribute("Stock", order.getStock());
+	         newElementOrder.setAttribute("Units", unit);
+	         newElementOrder.setAttribute("Price", price);
+	         
+	         //Add node
+	         Node n = doc.getDocumentElement();
+	         n.appendChild(newElementOrder);
+	         
+	         //Save file
+	         System.out.println("Save XML document.");
+	         Transformer transformer = TransformerFactory.newInstance().newTransformer();
+	         transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+	         StreamResult result = new StreamResult(new FileOutputStream("Xml_US.xml"));
+	         DOMSource source = new DOMSource(doc);
+	         transformer.transform(source, result);
+	         
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
 	/**
 	 * 
 	 * Verifies if the message sent by a client as at least 10 units.
