@@ -29,6 +29,12 @@ public class MicroServerTest {
 	private ServerComm serverComm;
 	
 	@Mock
+	 private ServerSideMessage connectT;
+	
+	@Mock
+	 private ServerSideMessage notEnoughUnits;
+	
+	@Mock
 	private ServerSideMessage msg1;
 	
 	@Mock
@@ -105,6 +111,14 @@ public class MicroServerTest {
 		when(msg10.getOrder()).thenReturn(null);
 		when(msg10.getSenderNickname()).thenReturn("userA");	
 		
+		when(connectT.getType()).thenReturn(Type.CONNECTED);
+		when(connectT.getOrder()).thenReturn(null);
+		when(connectT.getSenderNickname()).thenReturn("tmggs");
+		
+		when(notEnoughUnits.getType()).thenReturn(Type.NEW_ORDER);
+		when(notEnoughUnits.getOrder()).thenReturn(Order.createSellOrder("tmggs", "ISCTE", 9, 20));
+		when(notEnoughUnits.getSenderNickname()).thenReturn("tmggs");
+		
 		
 	}
 	
@@ -127,8 +141,8 @@ public class MicroServerTest {
 		
 		ms.start(serverComm);
 		
-		verify(serverComm, atLeastOnce()).sendOrder("userB", Order.createSellOrder("userA", "MSFT", 5, 20.0) );
-		verify(serverComm, atLeastOnce()).sendOrder("userB", Order.createBuyOrder("userB", "MSFT", 0, 21.0) );
+		verify(serverComm, atLeastOnce()).sendOrder("userB", Order.createSellOrder("userA", "MSFT", 10, 20.0) );
+		verify(serverComm, atLeastOnce()).sendOrder("userB", Order.createBuyOrder("userA", "MSFT", 10, 20.0) );
 	}
 	
 	@Test
@@ -172,7 +186,7 @@ public class MicroServerTest {
 		when(serverComm.getNextMessage()).thenReturn(msg1).thenReturn(msg2).thenReturn(msg3).thenReturn(msg4).thenReturn(msg5).thenReturn(msg6).thenReturn(null);
 		ms.start(serverComm);
 		
-		verify(serverComm, atLeastOnce()).sendOrder("userA", Order.createSellOrder("userA", "MSFT", 5, 20.0));
+		verify(serverComm, atLeastOnce()).sendOrder("userA", Order.createSellOrder("userA", "MSFT", 10, 20.0));
 	}
 	
 	@Test
@@ -182,6 +196,15 @@ public class MicroServerTest {
 		
 		verify(serverComm, atLeastOnce()).sendError(msg1.getSenderNickname(), "The user " + msg1.getSenderNickname() + " is already connected.");
 	}
+	
+	@Test
+	 	public void testOfferWithNotEnoughUnits(){
+	 		when(serverComm.getNextMessage()).thenReturn(connectT).thenReturn(notEnoughUnits).thenReturn(null);
+	 		ms.start(serverComm);
+	 		
+	 		verify(serverComm, never()).sendOrder("tmggs",Order.createSellOrder("tmggs", "ISCTE", 9, 20.0) );
+	 	}
+	 	
 	
 //	@Test
 //	public void testProcessUserDisconnected() throws Exception {		
