@@ -102,15 +102,13 @@ public class MicroServer implements MicroTraderServer {
 				case NEW_ORDER:
 					try {
 						verifyUserConnected(msg);
-						if(!checkSellOrdersLimit(msg)){
+						if(!checkSellOrdersLimit(msg) || !verifyMinimumOrderReq(msg)){
 							break;
 						}
 						if(msg.getOrder().getServerOrderID() == EMPTY){
 							msg.getOrder().setServerOrderID(id++);
 						}
-						if(!verifyMinimumOrderReq(msg)){
-							 break;
-						}
+						
 						notifyAllClients(msg.getOrder());
 						processNewOrder(msg);
 					} catch (ServerException e) {
