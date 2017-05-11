@@ -271,7 +271,7 @@ public class MicroServerTest {
 		
 		ms.start(serverComm);
 		
-		verify(serverComm, atLeastOnce()).sendError("gLid", "Sell orders limit exceeded.");
+		verify(serverComm, times(5)).sendOrder("gLid", Order.createBuyOrder("gLid","ISCTE", 15, 21.0));
 	}
 	
 	@Test
