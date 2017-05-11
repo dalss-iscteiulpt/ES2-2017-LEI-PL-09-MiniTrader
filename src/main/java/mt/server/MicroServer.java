@@ -57,7 +57,7 @@ public class MicroServer implements MicroTraderServer {
 	 */
 	private static int id = 1;
 	
-	private int MAX_SELL_ORDERS_PER_USER = 5;
+	final private int MAX_SELL_ORDERS_PER_USER = 5;
 	
 	/** The value is {@value #EMPTY} */
 	public static final int EMPTY = 0;
