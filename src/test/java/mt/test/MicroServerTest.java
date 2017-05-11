@@ -243,7 +243,7 @@ public class MicroServerTest {
 		when(serverComm.getNextMessage()).thenReturn(connectT).thenReturn(sell1).thenReturn(sell2).thenReturn(sell3).thenReturn(sell4).thenReturn(sell5).thenReturn(sell6).thenReturn(null);
 		ms.start(serverComm);
 		
-		verify(serverComm, atLeastOnce()).sendError("tmggs", "Sell orders limit exceeded");
+		verify(serverComm, times(5)).sendOrder("tmggs",Order.createSellOrder("tmggs", "ISCTE", 15, 21.0));
 	}
 	
 	@Test
@@ -251,7 +251,7 @@ public class MicroServerTest {
 		when(serverComm.getNextMessage()).thenReturn(connectT).thenReturn(notEnoughUnits).thenReturn(null);
 		ms.start(serverComm);
 		
-		verify(serverComm, atLeastOnce()).sendError("tmggs", "Minimum Number of Units per Order must be 10.");
+		verify(serverComm, never()).sendOrder("tmggs", Order.createSellOrder("tmggs", "ISCTE", 9, 20));
 	}
 	
 //	@Test

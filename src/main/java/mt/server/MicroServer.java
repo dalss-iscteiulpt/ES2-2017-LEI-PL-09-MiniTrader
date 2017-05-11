@@ -139,10 +139,10 @@ public class MicroServer implements MicroTraderServer {
 				case NEW_ORDER:
 					try {
 						verifyUserConnected(msg);
-						checkSellOrdersLimit(msg.getOrder());
-						if(verifyMinimumOrderReq(msg) == false){
-							throw new ServerException("Minimum Number of Units per Order must be 10.");
+						if(!checkSellOrdersLimit(msg) || !verifyMinimumOrderReq(msg)){
+							break;
 						}
+						
 						if(msg.getOrder().getServerOrderID() == EMPTY){
 							msg.getOrder().setServerOrderID(id++);
 						}
@@ -475,19 +475,20 @@ public class MicroServer implements MicroTraderServer {
 	 * Checks if an user has hit the limit number of Sell orders at the same time.
 	 * 
 	 * @param newOrder
-	 * @throws ServerException
 	 */
-	private void checkSellOrdersLimit(Order newOrder) throws ServerException {
+	private boolean checkSellOrdersLimit(ServerSideMessage msg) {
 		int count = 0;
-		Set<Order> userOrders = orderMap.get(newOrder.getNickname());
+		Set<Order> userOrders = orderMap.get(msg.getOrder().getNickname());
 		
 		for(Order obj: userOrders){
 			if(obj.isSellOrder()){
 				count++;
 			}
 		}
-		if(count == MAX_SELL_ORDERS){
-			throw new ServerException("Sell orders limit exceeded");
+		if(count < MAX_SELL_ORDERS){
+			return true;
+		} else {
+			return false;
 		}
 	}
 
