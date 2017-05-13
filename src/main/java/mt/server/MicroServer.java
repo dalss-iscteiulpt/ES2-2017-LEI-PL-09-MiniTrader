@@ -162,7 +162,8 @@ public class MicroServer implements MicroTraderServer {
 	         newElementOrder.setAttribute("Stock", order.getStock());
 	         newElementOrder.setAttribute("Units", unit);
 	         newElementOrder.setAttribute("Price", price);
-	         
+	         newElementOrder.setAttribute("Sender", msg.getSenderNickname());
+	        
 	         //Add node
 	         Node n = doc.getDocumentElement();
 	         n.appendChild(newElementOrder);
@@ -170,7 +171,7 @@ public class MicroServer implements MicroTraderServer {
 	         //Save file
 	         Transformer transformer = TransformerFactory.newInstance().newTransformer();
 	         transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-	         StreamResult result = new StreamResult(new FileOutputStream("Xml_US.xml"));
+	         StreamResult result = new StreamResult(new FileOutputStream("Xml_AS.xml"));
 	         DOMSource source = new DOMSource(doc);
 	         transformer.transform(source, result);
 	         System.out.println("Save XML document.");
