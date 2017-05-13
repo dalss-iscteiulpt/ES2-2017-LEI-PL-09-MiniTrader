@@ -101,7 +101,7 @@ public class AnalyticsFilter implements ServerComm {
 	public boolean checkDisconectedTimer(String name) {
 		for (int i = 0; i < userMessage.size(); i++) {
 			if (name.equals(userMessage.get(i).getUsername())) {
-				if (System.currentTimeMillis() - userMessage.get(i).getTime() < 30000) {
+				if (System.currentTimeMillis() - userMessage.get(i).getTime() < 5000) {
 					return false;
 				} else {
 
