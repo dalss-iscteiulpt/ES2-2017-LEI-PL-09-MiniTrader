@@ -458,7 +458,7 @@ public class MicroServer implements MicroTraderServer {
 	private boolean checkSellOrdersLimit(ServerSideMessage msg) {
 		int count = 0;
 		Set<Order> userOrders = orderMap.get(msg.getOrder().getNickname());
-		
+
 		for(Order obj: userOrders){
 			if(obj.isSellOrder()){
 				count++;
@@ -467,7 +467,11 @@ public class MicroServer implements MicroTraderServer {
 		if(count < MAX_SELL_ORDERS){
 			return true;
 		} else {
-			return false;
+			if(msg.getOrder().isSellOrder())
+				return false;
+			else {
+				return true;
+			}
 		}
 	}
 
