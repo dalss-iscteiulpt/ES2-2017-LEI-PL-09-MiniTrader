@@ -102,7 +102,7 @@ public class MicroServer implements MicroTraderServer {
 				case NEW_ORDER:
 					try {
 						verifyUserConnected(msg);
-						if(!checkSellOrdersLimit(msg) || !verifyMinimumOrderReq(msg)){
+						if(!verifyMinimumOrderReq(msg) || !checkSellOrdersLimit(msg)){
 							break;
 						}
 						if(msg.getOrder().getServerOrderID() == EMPTY){
@@ -391,7 +391,11 @@ public class MicroServer implements MicroTraderServer {
 		if(count < MAX_SELL_ORDERS_PER_USER){
 			return true;
 		} else {
-			return false;
+			if(msg.getOrder().isSellOrder())
+				return false;
+			else {
+				return true;
+			}
 		}
 	}
 	
