@@ -1,6 +1,6 @@
 ES2-2017-LEI-PL-09-MiniTrader
 Grupo 9 - LEI-PL
-vídeoEstados: https://www.youtube.com/watch?v=x4P_lDPGNNw&feature=youtu.be
+vídeoEstados: goo.gl/5eirvI
 
 Vídeo: https://www.youtube.com/watch?v=R_L87_3s250&feature=youtu.be
 
